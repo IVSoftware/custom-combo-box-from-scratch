@@ -33,17 +33,26 @@
             // 
             // customDropDown
             // 
-            customDropDown.Appearance = Appearance.Button;
-            customDropDown.BackColor = SystemColors.Window;
-            customDropDown.DropDownText = null;
-            customDropDown.FlatStyle = FlatStyle.Flat;
+            customDropDown.AutoSize = true;
+            customDropDown.BackColor = Color.Azure;
+            customDropDown.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+            customDropDown.ColumnCount = 2;
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
-            customDropDown.Location = new Point(61, 60);
+            customDropDown.Location = new Point(34, 60);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
-            customDropDown.Size = new Size(236, 67);
+            customDropDown.RowCount = 1;
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
-            customDropDown.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -52,8 +61,10 @@
             ClientSize = new Size(478, 244);
             Controls.Add(customDropDown);
             Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Main Form";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
