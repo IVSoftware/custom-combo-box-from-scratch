@@ -12,9 +12,9 @@ namespace debug_custom_combo_box
         }
     }
 
-    public class DropdownCheckBox : TableLayoutPanel, IMessageFilter
+    public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
     {
-        public DropdownCheckBox()
+        public CustomDropDownListFromScratch()
         {
             ColumnCount = 2;
             ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));

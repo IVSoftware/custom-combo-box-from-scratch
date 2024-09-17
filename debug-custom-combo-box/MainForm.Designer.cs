@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            customDropDown = new DropdownCheckBox();
+            customDropDown = new CustomDropDownListFromScratch();
             SuspendLayout();
             // 
             // customDropDown
@@ -69,6 +69,6 @@
 
         #endregion
 
-        private DropdownCheckBox customDropDown;
+        private CustomDropDownListFromScratch customDropDown;
     }
 }
