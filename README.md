@@ -1,4 +1,4 @@
-Sometimes people go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it's way less painful to start by inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to show a drop down, show a top level borderless form with a docked `FlowLayoutPanel` that can contain "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
+Sometimes people go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it's way less painful to start by inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked `FlowLayoutPanel` that can contain "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
 
 Here,we demonstrate a basic implemention.
 
