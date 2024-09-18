@@ -2,7 +2,9 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Security.Cryptography;
+using System.Windows.Forms.Design;
 
 namespace debug_custom_combo_box
 {
@@ -159,7 +161,7 @@ namespace debug_custom_combo_box
 
         #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        [Editor("System.ComponentModel.Design.CollectionEditor", typeof(System.Drawing.Design.UITypeEditor))]
+        [Editor(typeof(StringInputDialogEditor), typeof(UITypeEditor))]
         public BindingList<CustomTableLayoutPanelItem> Items
         {
             get { return _items; }
@@ -208,5 +210,43 @@ namespace debug_custom_combo_box
         private Button _button;
         public event EventHandler? ItemClicked;
         public override string ToString() => Text;
+    }
+    public class StringInputDialogEditor : UITypeEditor
+    {
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            // Specifies that this editor can display a modal dialog form
+            return UITypeEditorEditStyle.Modal;
+        }
+
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            IWindowsFormsEditorService editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+
+            if (editorService != null)
+            {
+                // Use a simple input dialog that allows the user to edit strings
+                Form inputForm = new Form
+                {
+                    Width = 300,
+                    Height = 150,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    Text = "Input String",
+                    StartPosition = FormStartPosition.CenterScreen
+                };
+                TextBox textBox = new TextBox { Dock = DockStyle.Fill, Multiline = true, Text = value as string ?? string.Empty };
+                Button okButton = new Button { Text = "OK", Dock = DockStyle.Bottom, DialogResult = DialogResult.OK };
+                inputForm.Controls.Add(textBox);
+                inputForm.Controls.Add(okButton);
+                inputForm.AcceptButton = okButton;
+
+                DialogResult dialogResult = editorService.ShowDialog(inputForm);
+                if (dialogResult == DialogResult.OK)
+                {
+                    return textBox.Text; // return the edited text
+                }
+            }
+            return value; // return original value if no changes were made
+        }
     }
 }
