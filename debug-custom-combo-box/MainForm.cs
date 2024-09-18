@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -15,9 +16,65 @@ namespace debug_custom_combo_box
         public MainForm()
         {
             InitializeComponent();
-            var items = new ComboBox().Items;
+            buttonTest.Click += (sender, e) =>
+            {
+                var editor = new StringCollectionEditor();
+                var testList = new BindingList<string> { "Item 1", "Item 2", "Item 3" };
+                ITypeDescriptorContext? context = null; 
+                IWindowsFormsEditorService editorService = new MockWindowsFormsEditorService();
+                var serviceProvider = new SimpleServiceProvider();
+                serviceProvider.AddService(typeof(IWindowsFormsEditorService), editorService);
+
+                if(serviceProvider is IWindowsFormsEditorService validProvider)
+                {
+                    if( serviceProvider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService validService)
+                    {
+                        // Invoke the editor
+                        var result = editor.EditValue(context, (IServiceProvider)validProvider, testList);
+                        MessageBox.Show($"Result: {string.Join(", ", result as IList<string>)}");
+                    }
+                    else Debug.Fail("Expecting valid service");
+                }
+                else Debug.Fail("Expecting valid provider" );
+            };
         }
     }
+    public class SimpleServiceProvider : IWindowsFormsEditorService, IServiceProvider
+    {
+        private Dictionary<Type, object> services = new Dictionary<Type, object>();
+
+        public void AddService(Type serviceType, object serviceInstance)
+        {
+            services[serviceType] = serviceInstance;
+        }
+
+        public void CloseDropDown() => throw new NotImplementedException();
+
+        public void DropDownControl(Control? control) => throw new NotImplementedException();
+
+        public object GetService(Type serviceType)
+        {
+            services.TryGetValue(serviceType, out var service);
+            return service;
+        }
+
+        public DialogResult ShowDialog(Form dialog)
+        {
+            return default;
+        }
+    }
+
+    public class MockWindowsFormsEditorService : IWindowsFormsEditorService
+    {
+        public DialogResult ShowDialog(Form dialog) => dialog.ShowDialog();
+
+        public void DropDownControl(Control control) =>
+            throw new NotImplementedException("Not required for modal editors");
+
+        public void CloseDropDown() =>
+            throw new NotImplementedException("Not required for modal editors");
+    }
+
 
     public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
     {
@@ -214,13 +271,11 @@ namespace debug_custom_combo_box
     {
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
         {
-            throw new NotImplementedException();
             return UITypeEditorEditStyle.Modal;
         }
 
         public override object EditValue(ITypeDescriptorContext? context, IServiceProvider? provider, object? value)
         {
-            throw new NotImplementedException();
             if (
                 provider is IWindowsFormsEditorService validProvider &&
                 provider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService editorService)
@@ -230,37 +285,40 @@ namespace debug_custom_combo_box
                     using (Form form = new Form
                     {
                         FormBorderStyle = FormBorderStyle.None,
-                        StartPosition = FormStartPosition.CenterScreen,
+                        StartPosition = FormStartPosition.CenterParent,
                         Width = 300,
                         Height = 400,
+                        Padding = new Padding(2),
+                        BackColor = Color.Maroon,
                     })
                     {
                         TextBox textBox = new TextBox
                         {
                             Multiline = true,
-                            ScrollBars = ScrollBars.Vertical,
                             Dock = DockStyle.Fill,
                             Text = string.Join(Environment.NewLine, strings)
                         };
-
                         Button okButton = new Button
                         {
                             Text = "OK",
                             Dock = DockStyle.Bottom,
-                            DialogResult = DialogResult.OK
+                            DialogResult = DialogResult.OK,
+                            Height = 50,
+                            ForeColor = Color.White,
                         };
 
                         Button cancelButton = new Button
                         {
                             Text = "Cancel",
                             Dock = DockStyle.Bottom,
-                            DialogResult = DialogResult.Cancel
+                            DialogResult = DialogResult.Cancel,
+                            Height = 50,
+                            ForeColor = Color.White,
                         };
 
                         form.Controls.Add(textBox);
                         form.Controls.Add(okButton);
                         form.Controls.Add(cancelButton);
-                        form.AcceptButton = okButton;
                         form.CancelButton = cancelButton;
 
                         if (editorService.ShowDialog(form) == DialogResult.OK)

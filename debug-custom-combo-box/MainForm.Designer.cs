@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             customDropDown = new CustomDropDownListFromScratch();
+            buttonTest = new Button();
             SuspendLayout();
             // 
             // customDropDown
@@ -37,6 +38,8 @@
             customDropDown.BackColor = Color.Azure;
             customDropDown.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
             customDropDown.ColumnCount = 2;
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -81,14 +84,25 @@
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
+            // 
+            // buttonTest
+            // 
+            buttonTest.Location = new Point(34, 171);
+            buttonTest.Name = "buttonTest";
+            buttonTest.Size = new Size(112, 34);
+            buttonTest.TabIndex = 1;
+            buttonTest.Text = "Test";
+            buttonTest.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(478, 244);
+            Controls.Add(buttonTest);
             Controls.Add(customDropDown);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -100,5 +114,6 @@
         #endregion
 
         private CustomDropDownListFromScratch customDropDown;
+        private Button buttonTest;
     }
 }
