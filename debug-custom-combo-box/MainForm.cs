@@ -2,6 +2,8 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing.Design;
 using System.Security.Cryptography;
 using System.Windows.Forms.Design;
@@ -158,19 +160,15 @@ namespace debug_custom_combo_box
             }
         }
 
-
         #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        [Editor(typeof(StringInputDialogEditor), typeof(UITypeEditor))]
-        public BindingList<CustomTableLayoutPanelItem> Items
+        [Editor(typeof(StringCollectionEditor), typeof(UITypeEditor))]
+        public BindingList<string> Items
         {
             get { return _items; }
-            set
-            {
-                _items = value;
-            }
+            set { _items = value; }
         }
-        private BindingList<CustomTableLayoutPanelItem> _items = new BindingList<CustomTableLayoutPanelItem>();
+        private BindingList<string> _items = new BindingList<string>();
         #endregion Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
     }
     /// <summary>
@@ -212,38 +210,67 @@ namespace debug_custom_combo_box
         public event EventHandler? ItemClicked;
         public override string ToString() => Text;
     }
-    public class StringInputDialogEditor : UITypeEditor
+    public class StringCollectionEditor : UITypeEditor
     {
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) =>
-            UITypeEditorEditStyle.Modal;
-
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
         {
-            IWindowsFormsEditorService editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+            throw new NotImplementedException();
+            return UITypeEditorEditStyle.Modal;
+        }
 
-            if (editorService != null)
+        public override object EditValue(ITypeDescriptorContext? context, IServiceProvider? provider, object? value)
+        {
+            throw new NotImplementedException();
+            if (
+                provider is IWindowsFormsEditorService validProvider &&
+                provider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService editorService)
             {
-                Form inputForm = new Form
+                if (editorService != null && value is IList<string> strings)
                 {
-                    Width = 300,
-                    Height = 150,
-                    FormBorderStyle = FormBorderStyle.FixedDialog,
-                    Text = "Input String",
-                    StartPosition = FormStartPosition.CenterScreen
-                };
-                TextBox textBox = new TextBox { Dock = DockStyle.Fill, Multiline = true, Text = value as string ?? string.Empty };
-                Button okButton = new Button { Text = "OK", Dock = DockStyle.Bottom, DialogResult = DialogResult.OK };
-                inputForm.Controls.Add(textBox);
-                inputForm.Controls.Add(okButton);
-                inputForm.AcceptButton = okButton;
+                    using (Form form = new Form
+                    {
+                        FormBorderStyle = FormBorderStyle.None,
+                        StartPosition = FormStartPosition.CenterScreen,
+                        Width = 300,
+                        Height = 400,
+                    })
+                    {
+                        TextBox textBox = new TextBox
+                        {
+                            Multiline = true,
+                            ScrollBars = ScrollBars.Vertical,
+                            Dock = DockStyle.Fill,
+                            Text = string.Join(Environment.NewLine, strings)
+                        };
 
-                DialogResult dialogResult = editorService.ShowDialog(inputForm);
-                if (dialogResult == DialogResult.OK)
-                {
-                    return textBox.Text;
+                        Button okButton = new Button
+                        {
+                            Text = "OK",
+                            Dock = DockStyle.Bottom,
+                            DialogResult = DialogResult.OK
+                        };
+
+                        Button cancelButton = new Button
+                        {
+                            Text = "Cancel",
+                            Dock = DockStyle.Bottom,
+                            DialogResult = DialogResult.Cancel
+                        };
+
+                        form.Controls.Add(textBox);
+                        form.Controls.Add(okButton);
+                        form.Controls.Add(cancelButton);
+                        form.AcceptButton = okButton;
+                        form.CancelButton = cancelButton;
+
+                        if (editorService.ShowDialog(form) == DialogResult.OK)
+                        {
+                            value = textBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        }
+                    }
                 }
             }
-            return value;
+            return value ?? new object();
         }
     }
 }
