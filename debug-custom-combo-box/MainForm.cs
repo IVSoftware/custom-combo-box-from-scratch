@@ -201,6 +201,7 @@ namespace debug_custom_combo_box
             };
             Controls.Add(_button, 1, 0);
         }
+        [Browsable(true)]
         public new string Text
         {
             get => _label.Text;
@@ -213,11 +214,8 @@ namespace debug_custom_combo_box
     }
     public class StringInputDialogEditor : UITypeEditor
     {
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
-        {
-            // Specifies that this editor can display a modal dialog form
-            return UITypeEditorEditStyle.Modal;
-        }
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) =>
+            UITypeEditorEditStyle.Modal;
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
@@ -225,7 +223,6 @@ namespace debug_custom_combo_box
 
             if (editorService != null)
             {
-                // Use a simple input dialog that allows the user to edit strings
                 Form inputForm = new Form
                 {
                     Width = 300,
@@ -243,10 +240,10 @@ namespace debug_custom_combo_box
                 DialogResult dialogResult = editorService.ShowDialog(inputForm);
                 if (dialogResult == DialogResult.OK)
                 {
-                    return textBox.Text; // return the edited text
+                    return textBox.Text;
                 }
             }
-            return value; // return original value if no changes were made
+            return value;
         }
     }
 }
