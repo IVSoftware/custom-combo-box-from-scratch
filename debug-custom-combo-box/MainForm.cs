@@ -1,5 +1,7 @@
 
 
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Security.Cryptography;
 
 namespace debug_custom_combo_box
@@ -9,6 +11,7 @@ namespace debug_custom_combo_box
         public MainForm()
         {
             InitializeComponent();
+            var items = new ComboBox().Items;
         }
     }
 
@@ -66,7 +69,6 @@ namespace debug_custom_combo_box
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
         }
-
         private void Any_ButtonClick(object? sender, EventArgs e)
         {
             if ((sender is Button button))
@@ -74,7 +76,6 @@ namespace debug_custom_combo_box
                 _labelDropDown.Text = button.Text;
             }
         }
-
         private readonly Label _labelDropDown = new Label
         {
             Dock = DockStyle.Fill,
@@ -110,7 +111,6 @@ namespace debug_custom_combo_box
             get => _labelDropDown.Text;
             set => _labelDropDown.Text = value;
         }
-
         const int WM_LBUTTONDOWN = 0x201;
         public bool PreFilterMessage(ref Message m)
         {
@@ -155,5 +155,58 @@ namespace debug_custom_combo_box
                 }
             }
         }
+
+
+        #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [Editor("System.ComponentModel.Design.CollectionEditor", typeof(System.Drawing.Design.UITypeEditor))]
+        public BindingList<CustomTableLayoutPanelItem> Items
+        {
+            get { return _items; }
+            set
+            {
+                _items = value;
+            }
+        }
+        private BindingList<CustomTableLayoutPanelItem> _items = new BindingList<CustomTableLayoutPanelItem>();
+        #endregion Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
+    }
+    /// <summary>
+    /// Mutable item class that defaults to 2 columns (Auto, 80) where
+    /// the Label is on the left and a button with the legend "-" is
+    /// in column 1 (this will eventually allow removal of the item)
+    /// </summary>
+    public class CustomTableLayoutPanelItem : TableLayoutPanel
+    {
+        public CustomTableLayoutPanelItem()
+        {
+            ColumnCount = 2;
+            RowCount = 1;
+            ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80));
+
+            _label = new Label
+            {
+                Text = "Item",
+                Dock = DockStyle.Fill,
+                TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
+            };
+            Controls.Add(_label, 0, 0);
+            _button = new Button
+            {
+                Text = "-",
+                Dock = DockStyle.Fill,
+            };
+            Controls.Add(_button, 1, 0);
+        }
+        public new string Text
+        {
+            get => _label.Text;
+            set => _label.Text = value;
+        }
+        private Label _label;
+        private Button _button;
+        public event EventHandler? ItemClicked;
+        public override string ToString() => Text;
     }
 }
