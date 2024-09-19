@@ -44,7 +44,6 @@
             customDropDown.ColumnCount = 2;
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
             item1.BackColor = Color.LavenderBlush;
             item1.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
@@ -64,7 +63,10 @@
             customDropDown.Location = new Point(34, 114);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
+            customDropDown.PlaceholderText = "Select";
             customDropDown.RowCount = 1;
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);

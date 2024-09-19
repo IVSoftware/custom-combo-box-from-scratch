@@ -57,11 +57,11 @@ namespace debug_custom_combo_box
                             Width = 25,
                             BackColor = SystemColors.ControlDark,
                             ForeColor = Color.White,
-                            Text = "-",
+                            Text = "X",
                             Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
                             FlatStyle = FlatStyle.Flat,
                         };
-                        button.FlatAppearance.BorderSize = 0;
+                        //button.FlatAppearance.BorderSize = 0;
                         checkBox
                         .AddFunctionButton(button)
                         .MouseDown += Any_Remove;
@@ -122,34 +122,41 @@ namespace debug_custom_combo_box
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            if (!_initialized)
+        }
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+            if (Visible)
             {
-                _initialized = true;
-                if (ColumnCount < 2)
+                if (!_initialized)
                 {
-                    ColumnCount = 2;
+                    _initialized = true;
+                    if (ColumnCount < 2)
+                    {
+                        ColumnCount = 2;
+                    }
+                    if (ColumnStyles.Count < 2)
+                    {
+                        ColumnStyles.Clear();
+                        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                        ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+                    }
+                    if (RowCount == 0)
+                    {
+                        RowCount = 1;
+                    }
+                    if (RowStyles.Count == 0)
+                    {
+                        RowStyles.Clear();
+                        RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                    }
+                    if (Controls.Count == 0)
+                    {
+                        Controls.Add(_labelDropDown, 0, 0);
+                        Controls.Add(_buttonDropDown, 1, 0);
+                    }
+                    DropDownText = PlaceholderText;
                 }
-                if(ColumnStyles.Count < 2)
-                {
-                    ColumnStyles.Clear();
-                    ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                    ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-                }
-                if (RowCount == 0)
-                {
-                    RowCount = 1;
-                }
-                if (RowStyles.Count == 0)
-                {
-                    RowStyles.Clear();
-                    RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                }
-                if (Controls.Count == 0)
-                {
-                    Controls.Add(_labelDropDown, 0, 0);
-                    Controls.Add(_buttonDropDown, 1, 0);
-                }
-                DropDownText = PlaceholderText;
             }
         }
 
