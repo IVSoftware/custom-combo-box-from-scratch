@@ -1,6 +1,7 @@
 using IVSoftware.Portable;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace debug_custom_combo_box
 {
@@ -32,11 +33,13 @@ namespace debug_custom_combo_box
             AutoSize = true;
             Items.ListChanged += (sender, e) =>
             {
+                CheckBox checkBox;
+                Item item;
                 switch (e.ListChangedType)
                 {
                     case ListChangedType.ItemAdded:
-                        var item = Items[e.NewIndex];
-                        _flowLayoutPanel.Controls.Add(new CheckBox
+                        item = Items[e.NewIndex];
+                        checkBox = new CheckBox
                         {
                             Text = item.Text,
                             Height = 80,
@@ -45,10 +48,14 @@ namespace debug_custom_combo_box
                             Appearance =
                                 item.ControlStyle == ControlStyle.Checkbox ?
                                 Appearance.Normal :
-                                Appearance.Button
-                        });
+                                Appearance.Button,
+                        };
+                        checkBox.MouseDown += Any_ControlClick;
+                        _flowLayoutPanel.Controls.Add(checkBox);
+                        item.Control = checkBox;
                         break;
                     case ListChangedType.ItemDeleted:
+                        item = Items[e.OldIndex];
                         break;
                     case ListChangedType.ItemMoved:
                         break;
@@ -67,8 +74,6 @@ namespace debug_custom_combo_box
                     foreach (var control in _flowLayoutPanel.Controls.OfType<Control>())
                     {
                         control.Width = Width;
-                        control.MouseDown -= Any_ControlClick;
-                        control.MouseDown += Any_ControlClick;
                     }
                 }
             };
@@ -291,6 +296,10 @@ namespace debug_custom_combo_box
 
             [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public Color ForeColor { get; set; } = Color.Black;
+
+            [Browsable(false)]
+            internal CheckBox? Control { get; set; }
+
             public override string ToString() => Text;
         }
     }
