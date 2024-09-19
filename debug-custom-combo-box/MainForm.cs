@@ -219,7 +219,6 @@ namespace debug_custom_combo_box
 
         #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        [Editor(typeof(StringCollectionEditor), typeof(UITypeEditor))]
         public BindingList<string> Items
         {
             get { return _items; }
