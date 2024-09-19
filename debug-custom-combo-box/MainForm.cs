@@ -2,7 +2,6 @@ using IVSoftware.Portable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace debug_custom_combo_box
 {
@@ -51,7 +50,8 @@ namespace debug_custom_combo_box
                                 Appearance.Normal :
                                 Appearance.Button,
                         }; 
-                        var button = new Button
+                        checkBox
+                        .AddInlineFunctionButton(new Button
                         {
                             Height = 25,
                             Width = 25,
@@ -60,10 +60,7 @@ namespace debug_custom_combo_box
                             Text = "X",
                             Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
                             FlatStyle = FlatStyle.Flat,
-                        };
-                        //button.FlatAppearance.BorderSize = 0;
-                        checkBox
-                        .AddFunctionButton(button)
+                        })
                         .MouseDown += Any_Remove;
 
                         checkBox.MouseDown += Any_ControlClick;
@@ -119,44 +116,51 @@ namespace debug_custom_combo_box
         }
         // Try to innoculate against handle recreation at design time.
         bool _initialized = false;
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-        }
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-            if (Visible)
+            if (Visible && !_initialized)
             {
-                if (!_initialized)
+                _initialized = true;
+                if (ColumnCount < 2)
                 {
-                    _initialized = true;
-                    if (ColumnCount < 2)
-                    {
-                        ColumnCount = 2;
-                    }
-                    if (ColumnStyles.Count < 2)
-                    {
-                        ColumnStyles.Clear();
-                        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                        ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-                    }
-                    if (RowCount == 0)
-                    {
-                        RowCount = 1;
-                    }
-                    if (RowStyles.Count == 0)
-                    {
-                        RowStyles.Clear();
-                        RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                    }
-                    if (Controls.Count == 0)
-                    {
-                        Controls.Add(_labelDropDown, 0, 0);
-                        Controls.Add(_buttonDropDown, 1, 0);
-                    }
-                    DropDownText = PlaceholderText;
+                    ColumnCount = 2;
                 }
+                if (ColumnStyles.Count < 2)
+                {
+                    ColumnStyles.Clear();
+                    ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                    ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+                }
+                if (RowCount == 0)
+                {
+                    RowCount = 1;
+                }
+                if (RowStyles.Count == 0)
+                {
+                    RowStyles.Clear();
+                    RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                }
+                if (Controls.Count == 0)
+                {
+                    Controls.Add(_labelDropDown, 0, 0);
+                    Controls.Add(_buttonDropDown, 1, 0);
+                }
+                DropDownText = PlaceholderText;
+                _labelDropDown
+                .AddInlineFunctionButton(new Button
+                {
+                    Height = 25,
+                    Width = 25,
+                    BackColor = SystemColors.ControlDark,
+                    ForeColor = Color.White,
+                    Text = "+",
+                    Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                    FlatStyle = FlatStyle.Flat,
+                }, padRight: 5).Click += (sender, e) =>
+                {
+                    _itemEditorPropertyForm.ShowDialog(this);
+                };
             }
         }
 
@@ -325,7 +329,7 @@ namespace debug_custom_combo_box
             set { _items = value; }
         }
         private BindingList<Item> _items = new BindingList<Item>();
-
+        private ItemEditorPropertyForm _itemEditorPropertyForm = new ItemEditorPropertyForm();
         public enum ControlStyle
         {
             Button,
@@ -347,24 +351,114 @@ namespace debug_custom_combo_box
 
             public override string ToString() => Text;
         }
+        class ItemEditorPropertyForm : Form
+        {
+            public ItemEditorPropertyForm()
+            {
+                Text = "Edit Item Properties";
+                ClientSize = new Size(400, 300);
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MinimizeBox = false;
+                MaximizeBox = false;
+                StartPosition = FormStartPosition.CenterParent;
+                Controls.Add(_propertyGrid);
+                var okButton = this.AddInlineControl(new Button
+                {
+                    Text = "OK",
+                    DialogResult = DialogResult.OK,
+                    Size = new Size(75, 23),
+                    Location = new Point(ClientSize.Width - 180, ClientSize.Height - 30),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = SystemColors.ControlDark,
+                    ForeColor = Color.White,
+                    Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point),
+                });
+                AcceptButton = okButton;  // Set as accept button to handle Enter key
+
+                // Cancel button setup using AddInlineControl with location set in initializer
+                var cancelButton = this.AddInlineControl(new Button
+                {
+                    Text = "Cancel",
+                    DialogResult = DialogResult.Cancel,
+                    Size = new Size(75, 23),
+                    Location = new Point(ClientSize.Width - 90, ClientSize.Height - 30),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = SystemColors.ControlDark,
+                    ForeColor = Color.White,
+                    Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point),
+                });
+                CancelButton = cancelButton;  // Set as cancel button to handle Escape key
+            }
+            public new DialogResult ShowDialog(IWin32Window owner) => 
+                ShowDialog(owner, new Item());
+            public DialogResult ShowDialog(IWin32Window owner, Item item)
+            {        
+                _propertyGrid.SelectedObject = item;
+                return base.ShowDialog(owner);
+            }
+            PropertyGrid _propertyGrid = new PropertyGrid
+            {
+                Dock = DockStyle.Top,
+            };
+            public Item? CurrentItem => _propertyGrid.SelectedObject as Item;
+
+            [Obsolete($"Use DialogResult ShowDialog(IWin32Window owner, Item item = null)")]
+            public new DialogResult ShowDialog() => throw new NotImplementedException();
+        }
     }
     static partial class Extensions
     {
-        public static Button AddFunctionButton(this Control control, Button button, int padRight = 20)
+        /// <summary>
+        /// Adds a function button to a control and allows for immediate inline event assignment.
+        /// This method positions the button on the right with a specified padding and centers it vertically.
+        /// </summary>
+        /// <param name="parent">The parent control to which the button is added.</param>
+        /// <param name="button">The button to add to the control.</param>
+        /// <param name="padRight">Right padding from the edge of the parent control.</param>
+        /// <returns>The button added, allowing for inline event assignment, e.g., `.Click += ...`.</returns>
+        /// <example>
+        /// <code>
+        /// parentControl
+        /// .AddInlineFunctionButton(new Button { Text = "Click Me" }, 20)
+        /// .Click += (sender, e) => { MessageBox.Show("Clicked!"); 
+        /// </code>
+        /// </example>
+        public static Button AddInlineFunctionButton(this Control parent, Button button, int padRight = 20)
         {
-            if (!control.Controls.Contains(button))
+            if (!parent.Controls.Contains(button))
             {
-                control.Controls.Add(button);
+                parent.Controls.Add(button);
                 localPositionButton();
             }
-            control.SizeChanged += (sender, e) => localPositionButton();
+            parent.SizeChanged += (sender, e) => localPositionButton();
             return button;
 
             void localPositionButton()
             {
-                button.Left = control.Width - (button.Width + padRight);
-                button.Top = (control.Height - button.Height) / 2;
+                button.Left = parent.Width - (button.Width + padRight);
+                button.Top = (parent.Height - button.Height) / 2;
             }
+        }
+        /// <summary>
+        /// Adds a control to a parent control's <see cref="Control.ControlCollection"/> and returns it, allowing for immediate inline modifications or event assignments.
+        /// This method facilitates inline configurations and event handler attachments directly after the control is added.
+        /// </summary>
+        /// <typeparam name="T">The type of the control being added, which must derive from <see cref="Control"/>.</typeparam>
+        /// <param name="parent">The parent control to which the control is added.</param>
+        /// <param name="control">The control to be added to the parent's collection.</param>
+        /// <returns>The control added, enabling inline modifications or event handling assignments such as setting properties or attaching events.</returns>
+        /// <example>
+        /// <code>
+        /// parentControl
+        /// .AddInlineControl(new Button { Text = "OK" })
+        /// .Click += (sender, e) => { MessageBox.Show("OK Clicked!"); };
+        /// </code>
+        /// </example>
+
+        public static T AddInlineControl<T>(this Control parent, T control) where T : Control
+        {
+            parent.Controls.Add(control);
+            return control;
         }
     }
 }
