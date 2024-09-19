@@ -86,8 +86,6 @@ namespace debug_custom_combo_box
         public CustomDropDownListFromScratch()
         {
             AutoSize = true;
-            Controls.Add(_labelDropDown, 0, 0);
-            Controls.Add(_buttonDropDown, 1, 0);
 
             for (int i = 1; i <= 3; i++)
             {
@@ -145,6 +143,11 @@ namespace debug_custom_combo_box
             {
                 RowCount = 1;
                 RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            }
+            if (Controls.Count == 0)
+            {
+                Controls.Add(_labelDropDown, 0, 0);
+                Controls.Add(_buttonDropDown, 1, 0);
             }
         }
         private void Any_ButtonClick(object? sender, EventArgs e)
