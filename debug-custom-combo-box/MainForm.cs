@@ -56,12 +56,10 @@ namespace debug_custom_combo_box
                         break;
                     case ListChangedType.ItemDeleted:
                         item = Items[e.OldIndex];
-                        break;
-                    case ListChangedType.ItemMoved:
-                        break;
-                    case ListChangedType.ItemChanged:
-                        break;
-                    default:
+                        if(item.Control is Control control)
+                        {
+                            control.MouseDown -= Any_ControlClick;
+                        }
                         break;
                 }
             };
