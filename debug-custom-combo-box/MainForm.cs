@@ -14,15 +14,13 @@ namespace debug_custom_combo_box
             {
                 switch (e.KeyData)
                 {
-                    case Keys.Enter: 
+                    case Keys.Enter:
                         e.SuppressKeyPress = true;
                         customDropDown.Items.Add(textBoxNewItem.Text);
                         textBoxNewItem.Clear();
                         break;
                 }
             };
-            buttonAdd.Click += (sender, e) => 
-            { };
         }
     }
 
@@ -216,7 +214,7 @@ namespace debug_custom_combo_box
         }
         private BindingList<Item> _items = new BindingList<Item>();
 
-        public enum ItemStyle
+        public enum ControlStyle
         {
             Button,
             Checkbox,
@@ -226,7 +224,10 @@ namespace debug_custom_combo_box
             public static implicit operator Item(string text) =>
                 new Item { Text = text };
             public string Text { get; set; } = "Item";
-            public ItemStyle Style { get; set; }
+            public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
+
+            [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public System.Drawing.Color ForeColor { get; set; } = System.Drawing.Color.Black;
             public override string ToString() => Text;
         }
     }

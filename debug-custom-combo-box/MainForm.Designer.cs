@@ -47,13 +47,9 @@
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
-            item1.Style = CustomDropDownListFromScratch.ItemStyle.Button;
             item1.Text = "Item A";
-            item2.Style = CustomDropDownListFromScratch.ItemStyle.Button;
             item2.Text = "Item B";
-            item3.Style = CustomDropDownListFromScratch.ItemStyle.Button;
             item3.Text = "Item C";
-            item4.Style = CustomDropDownListFromScratch.ItemStyle.Button;
             item4.Text = "Item D";
             customDropDown.Items.Add(item1);
             customDropDown.Items.Add(item2);
@@ -63,6 +59,8 @@
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
             customDropDown.RowCount = 1;
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
