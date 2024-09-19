@@ -149,6 +149,9 @@ namespace debug_custom_combo_box
                 Controls.Add(_labelDropDown, 0, 0);
                 Controls.Add(_buttonDropDown, 1, 0);
             }
+            foreach (StringItem item in Items)
+            {
+            }
         }
         private void Any_ButtonClick(object? sender, EventArgs e)
         {
@@ -237,15 +240,19 @@ namespace debug_custom_combo_box
             }
         }
 
-        #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)   
+        #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)  
+        
         // This custom editor IS NOT FOUND by Designer.
-        [Editor(typeof(CustomStringCollectionEditor), typeof(UITypeEditor))]
-        public ObservableCollection<StringItem> Items
+        // That's because this is a .NET Framework way of doing things.
+        // https://devblogs.microsoft.com/dotnet/custom-controls-for-winforms-out-of-process-designer/
+        // [Editor(typeof(CustomStringCollectionEditor), typeof(UITypeEditor))]
+
+        public BindingList<StringItem> Items
         {
             get { return _items; }
             set { _items = value; }
         }
-        private ObservableCollection<StringItem> _items = new ObservableCollection<StringItem>();
+        private BindingList<StringItem> _items = new BindingList<StringItem>();
         #endregion Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
 
         public class StringItem
