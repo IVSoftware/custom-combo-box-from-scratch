@@ -28,9 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            CustomDropDownListFromScratch.Item item1 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item2 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item3 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item4 = new CustomDropDownListFromScratch.Item();
             customDropDown = new CustomDropDownListFromScratch();
-            buttonTest = new Button();
             SuspendLayout();
             // 
             // customDropDown
@@ -43,6 +45,14 @@
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
+            item1.Text = "Item A";
+            item2.Text = "Item B";
+            item3.Text = "Item C";
+            item4.Text = "Item D";
+            customDropDown.Items.Add(item1);
+            customDropDown.Items.Add(item2);
+            customDropDown.Items.Add(item3);
+            customDropDown.Items.Add(item4);
             customDropDown.Location = new Point(34, 60);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
@@ -50,25 +60,17 @@
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
-            customDropDown.Paint += customDropDown_Paint;
-            // 
-            // buttonTest
-            // 
-            buttonTest.Location = new Point(34, 171);
-            buttonTest.Name = "buttonTest";
-            buttonTest.Size = new Size(112, 34);
-            buttonTest.TabIndex = 1;
-            buttonTest.Text = "Test";
-            buttonTest.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(478, 244);
-            Controls.Add(buttonTest);
             Controls.Add(customDropDown);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -80,6 +82,5 @@
         #endregion
 
         private CustomDropDownListFromScratch customDropDown;
-        private Button buttonTest;
     }
 }
