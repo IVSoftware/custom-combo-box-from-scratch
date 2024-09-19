@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            CustomDropDownListFromScratch.Item item1 = new CustomDropDownListFromScratch.Item();
-            CustomDropDownListFromScratch.Item item2 = new CustomDropDownListFromScratch.Item();
-            CustomDropDownListFromScratch.Item item3 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item4 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item5 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item6 = new CustomDropDownListFromScratch.Item();
             customDropDown = new CustomDropDownListFromScratch();
             textBoxNewItem = new TextBox();
             buttonAdd = new Label();
@@ -46,22 +46,23 @@
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
-            item1.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
-            item1.ForeColor = Color.FromArgb(192, 0, 0);
-            item1.Text = "Red Button";
-            item2.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Checkbox;
-            item2.ForeColor = Color.Green;
-            item2.Text = "Green Checkbox";
-            item3.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
-            item3.ForeColor = Color.FromArgb(0, 0, 192);
-            item3.Text = "Blue Button";
-            customDropDown.Items.Add(item1);
-            customDropDown.Items.Add(item2);
-            customDropDown.Items.Add(item3);
-            customDropDown.Location = new Point(34, 133);
+            item4.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
+            item4.ForeColor = Color.FromArgb(192, 0, 0);
+            item4.Text = "Red Button";
+            item5.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Checkbox;
+            item5.ForeColor = Color.Green;
+            item5.Text = "Green Checkbox";
+            item6.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
+            item6.ForeColor = Color.FromArgb(0, 0, 192);
+            item6.Text = "Blue Button";
+            customDropDown.Items.Add(item4);
+            customDropDown.Items.Add(item5);
+            customDropDown.Items.Add(item6);
+            customDropDown.Location = new Point(34, 114);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
             customDropDown.RowCount = 1;
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
@@ -72,20 +73,21 @@
             // textBoxNewItem
             // 
             textBoxNewItem.Font = new Font("Segoe UI", 12F);
-            textBoxNewItem.Location = new Point(117, 54);
+            textBoxNewItem.Location = new Point(117, 40);
             textBoxNewItem.Name = "textBoxNewItem";
-            textBoxNewItem.PlaceholderText = "New Item";
+            textBoxNewItem.PlaceholderText = "New Button Item";
             textBoxNewItem.Size = new Size(311, 39);
             textBoxNewItem.TabIndex = 1;
             // 
             // buttonAdd
             // 
             buttonAdd.Enabled = false;
-            buttonAdd.Location = new Point(34, 63);
+            buttonAdd.Location = new Point(34, 44);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(77, 34);
             buttonAdd.TabIndex = 2;
             buttonAdd.Text = "ADD";
+            buttonAdd.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // MainForm
             // 
