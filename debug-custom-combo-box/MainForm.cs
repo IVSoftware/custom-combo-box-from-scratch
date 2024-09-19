@@ -2,6 +2,7 @@ using IVSoftware.Portable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace debug_custom_combo_box
 {
@@ -52,7 +53,6 @@ namespace debug_custom_combo_box
                         }; 
                         var button = new Button
                         {
-                            Name = "Remove",
                             Height = 25,
                             Width = 25,
                             BackColor = SystemColors.ControlDark,
@@ -60,13 +60,13 @@ namespace debug_custom_combo_box
                             Text = "-",
                             Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
                             FlatStyle = FlatStyle.Flat,
-                            Anchor = AnchorStyles.Right,
                         };
                         button.FlatAppearance.BorderSize = 0;
+                        checkBox
+                        .AddFunctionButton(button)
+                        .MouseDown += Any_Remove;
 
-                        checkBox.Controls.Add(button);
                         checkBox.MouseDown += Any_ControlClick;
-                        button.MouseDown += Any_Remove;
                         _flowLayoutPanel.Controls.Add(checkBox);
                         item.Control = checkBox;
                         break;
@@ -88,13 +88,6 @@ namespace debug_custom_combo_box
                     foreach (var control in _flowLayoutPanel.Controls.OfType<Control>())
                     {
                         control.Width = Width;
-                        if(control.Controls["Remove"] is Button buttonRemove)
-                        {
-                            buttonRemove.Width = 25;
-                            buttonRemove.Height = 25;
-                            buttonRemove.Left = control.Width - (buttonRemove.Width + 20);
-                            buttonRemove.Top = (control.Height - buttonRemove.Height) / 2;
-                        }
                     }
                 }
             };
@@ -346,6 +339,25 @@ namespace debug_custom_combo_box
             internal CheckBox? Control { get; set; }
 
             public override string ToString() => Text;
+        }
+    }
+    static partial class Extensions
+    {
+        public static Button AddFunctionButton(this Control control, Button button, int padRight = 20)
+        {
+            if (!control.Controls.Contains(button))
+            {
+                control.Controls.Add(button);
+                localPositionButton();
+            }
+            control.SizeChanged += (sender, e) => localPositionButton();
+            return button;
+
+            void localPositionButton()
+            {
+                button.Left = control.Width - (button.Width + padRight);
+                button.Top = (control.Height - button.Height) / 2;
+            }
         }
     }
 }
