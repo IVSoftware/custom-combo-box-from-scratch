@@ -135,9 +135,9 @@ namespace debug_custom_combo_box
 
         private void Any_ControlClick(object? sender, EventArgs e)
         {
-            if ((sender is Button button))
+            if ((sender is Control control))
             {
-                _labelDropDown.Text = button.Text;
+                _labelDropDown.Text = control.Text;
             }
         }
         private readonly Label _labelDropDown = new Label
@@ -184,6 +184,7 @@ namespace debug_custom_combo_box
                 case WM_LBUTTONDOWN:
                     if (_dropDownContainer.Visible)
                     {
+                        bool wantClose = true;
                         if(FromHandle(hWnd) is Control target)
                         {
                             Point client = new Point(
@@ -197,24 +198,9 @@ namespace debug_custom_combo_box
                                 Size boxSize = SystemInformation.MenuCheckSize;
                                 Rectangle boxRect = new Rectangle(new Point(0, (checkBox.Height - boxSize.Height) / 2), boxSize);
 
-                                if (boxRect.Contains(client))
-                                {
-                                    return false;
-                                }
-                                else
-                                {
-                                    BeginInvoke(() => _dropDownContainer.Close());
-                                    return true;
-                                }
+                                wantClose = !boxRect.Contains(client);
                             }
-                            else
-                            {
-                                BeginInvoke(() => _dropDownContainer.Close());
-                                if (ReferenceEquals(target, _buttonDropDown))
-                                {
-                                    return true;
-                                }
-                            }
+                           if(wantClose) BeginInvoke(() => _dropDownContainer.Close());
                         }
                     }
                     break;
