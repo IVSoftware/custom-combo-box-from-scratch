@@ -156,6 +156,7 @@ namespace debug_custom_combo_box
                     Controls.Add(_labelDropDown, 0, 0);
                     Controls.Add(_buttonDropDown, 1, 0);
                 }
+                DropDownText = PlaceholderText;
             }
         }
 
@@ -206,11 +207,25 @@ namespace debug_custom_combo_box
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.TopDown,
         };
-        public string DropDownText
+        [Browsable(false)]
+        internal string DropDownText
         {
             get => _labelDropDown.Text;
             set => _labelDropDown.Text = value;
         }
+        public string PlaceholderText
+        {
+            get => _placeholderText;
+            set
+            {
+                if (!Equals(_placeholderText, value))
+                {
+                    _labelDropDown.Text = value;
+                    _placeholderText = value;
+                }
+            }
+        }
+        private string _placeholderText = "Select";
         const int WM_LBUTTONDOWN = 0x201;
         const int WM_KEYDOWN = 0x100;
         const int VK_ESCAPE = 0x1B;

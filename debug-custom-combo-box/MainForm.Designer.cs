@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            CustomDropDownListFromScratch.Item item4 = new CustomDropDownListFromScratch.Item();
-            CustomDropDownListFromScratch.Item item5 = new CustomDropDownListFromScratch.Item();
-            CustomDropDownListFromScratch.Item item6 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item1 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item2 = new CustomDropDownListFromScratch.Item();
+            CustomDropDownListFromScratch.Item item3 = new CustomDropDownListFromScratch.Item();
             customDropDown = new CustomDropDownListFromScratch();
             textBoxNewItem = new TextBox();
             buttonAdd = new Label();
@@ -46,22 +46,26 @@
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
-            item4.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
-            item4.ForeColor = Color.FromArgb(192, 0, 0);
-            item4.Text = "Red Button";
-            item5.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Checkbox;
-            item5.ForeColor = Color.Green;
-            item5.Text = "Green CheckBox";
-            item6.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
-            item6.ForeColor = Color.FromArgb(0, 0, 192);
-            item6.Text = "Blue Button";
-            customDropDown.Items.Add(item4);
-            customDropDown.Items.Add(item5);
-            customDropDown.Items.Add(item6);
+            item1.BackColor = Color.LavenderBlush;
+            item1.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
+            item1.ForeColor = Color.FromArgb(192, 0, 0);
+            item1.Text = "Red Button";
+            item2.BackColor = Color.White;
+            item2.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Checkbox;
+            item2.ForeColor = Color.Green;
+            item2.Text = "Green CheckBox";
+            item3.BackColor = Color.White;
+            item3.ControlStyle = CustomDropDownListFromScratch.ControlStyle.Button;
+            item3.ForeColor = Color.FromArgb(0, 0, 192);
+            item3.Text = "Blue Button";
+            customDropDown.Items.Add(item1);
+            customDropDown.Items.Add(item2);
+            customDropDown.Items.Add(item3);
             customDropDown.Location = new Point(34, 114);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
             customDropDown.RowCount = 1;
+            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
