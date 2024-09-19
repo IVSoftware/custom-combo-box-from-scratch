@@ -159,7 +159,12 @@ namespace debug_custom_combo_box
                     FlatStyle = FlatStyle.Flat,
                 }, padRight: 5).Click += (sender, e) =>
                 {
-                    _itemEditorPropertyForm.ShowDialog(this);
+                    if (
+                    _itemEditor.ShowDialog(this) == DialogResult.OK &&
+                    _itemEditor.CurrentItem is not null)
+                    {
+                        Items.Add(_itemEditor.CurrentItem);
+                    };
                 };
             }
         }
@@ -179,6 +184,10 @@ namespace debug_custom_combo_box
                 checkbox.Parent is FlowLayoutPanel parent)
             {
                 parent.Controls.Remove(checkbox);
+                if(string.Equals(DropDownText, checkbox.Text))
+                {
+                    DropDownText = PlaceholderText;
+                }
             };
         }
         private readonly Label _labelDropDown = new Label
@@ -329,7 +338,7 @@ namespace debug_custom_combo_box
             set { _items = value; }
         }
         private BindingList<Item> _items = new BindingList<Item>();
-        private ItemEditorPropertyForm _itemEditorPropertyForm = new ItemEditorPropertyForm();
+        private ItemEditorPropertyForm _itemEditor = new ItemEditorPropertyForm();
         public enum ControlStyle
         {
             Button,
@@ -353,6 +362,11 @@ namespace debug_custom_combo_box
         }
         class ItemEditorPropertyForm : Form
         {
+            private PropertyGrid _propertyGrid = new PropertyGrid
+            {
+                HelpVisible = false,
+            };
+            private TableLayoutPanel _tableLayoutPanel = new TableLayoutPanel();
             public ItemEditorPropertyForm()
             {
                 Text = "Edit Item Properties";
@@ -361,50 +375,60 @@ namespace debug_custom_combo_box
                 MinimizeBox = false;
                 MaximizeBox = false;
                 StartPosition = FormStartPosition.CenterParent;
-                Controls.Add(_propertyGrid);
-                var okButton = this.AddInlineControl(new Button
+
+                _tableLayoutPanel.Dock = DockStyle.Fill;
+                _tableLayoutPanel.RowCount = 2;
+                _tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+                _tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
+                _tableLayoutPanel.ColumnCount = 2;
+                _tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                _tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+
+                Controls.Add(_tableLayoutPanel);
+
+                _propertyGrid.Dock = DockStyle.Fill;
+                _tableLayoutPanel.Controls.Add(_propertyGrid, 0, 0);
+                _tableLayoutPanel.SetColumnSpan(_propertyGrid, 2);
+
+                var okButton = new Button
                 {
                     Text = "OK",
                     DialogResult = DialogResult.OK,
-                    Size = new Size(75, 23),
-                    Location = new Point(ClientSize.Width - 180, ClientSize.Height - 30),
+                    Dock = DockStyle.Fill,
                     FlatStyle = FlatStyle.Flat,
                     BackColor = SystemColors.ControlDark,
                     ForeColor = Color.White,
                     Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point),
-                });
-                AcceptButton = okButton;  // Set as accept button to handle Enter key
+                };
+                _tableLayoutPanel.Controls.Add(okButton, 0, 1);
+                AcceptButton = okButton;
 
-                // Cancel button setup using AddInlineControl with location set in initializer
-                var cancelButton = this.AddInlineControl(new Button
+                var cancelButton = new Button
                 {
                     Text = "Cancel",
                     DialogResult = DialogResult.Cancel,
-                    Size = new Size(75, 23),
-                    Location = new Point(ClientSize.Width - 90, ClientSize.Height - 30),
+                    Dock = DockStyle.Fill,
                     FlatStyle = FlatStyle.Flat,
                     BackColor = SystemColors.ControlDark,
                     ForeColor = Color.White,
                     Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point),
-                });
-                CancelButton = cancelButton;  // Set as cancel button to handle Escape key
+                };
+                _tableLayoutPanel.Controls.Add(cancelButton, 1, 1);
+                CancelButton = cancelButton;
             }
-            public new DialogResult ShowDialog(IWin32Window owner) => 
+            public new DialogResult ShowDialog(IWin32Window owner) =>
                 ShowDialog(owner, new Item());
             public DialogResult ShowDialog(IWin32Window owner, Item item)
-            {        
+            {
                 _propertyGrid.SelectedObject = item;
                 return base.ShowDialog(owner);
             }
-            PropertyGrid _propertyGrid = new PropertyGrid
-            {
-                Dock = DockStyle.Top,
-            };
             public Item? CurrentItem => _propertyGrid.SelectedObject as Item;
 
             [Obsolete($"Use DialogResult ShowDialog(IWin32Window owner, Item item = null)")]
             public new DialogResult ShowDialog() => throw new NotImplementedException();
         }
+
     }
     static partial class Extensions
     {
