@@ -49,8 +49,24 @@ namespace debug_custom_combo_box
                                 item.ControlStyle == ControlStyle.Checkbox ?
                                 Appearance.Normal :
                                 Appearance.Button,
+                        }; 
+                        var button = new Button
+                        {
+                            Name = "Remove",
+                            Height = 25,
+                            Width = 25,
+                            BackColor = SystemColors.ControlDark,
+                            ForeColor = Color.White,
+                            Text = "-",
+                            Font = new Font("Microsoft Sans Serif", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                            FlatStyle = FlatStyle.Flat,
+                            Anchor = AnchorStyles.Right,
                         };
+                        button.FlatAppearance.BorderSize = 0;
+
+                        checkBox.Controls.Add(button);
                         checkBox.MouseDown += Any_ControlClick;
+                        button.MouseDown += Any_Remove;
                         _flowLayoutPanel.Controls.Add(checkBox);
                         item.Control = checkBox;
                         break;
@@ -72,6 +88,13 @@ namespace debug_custom_combo_box
                     foreach (var control in _flowLayoutPanel.Controls.OfType<Control>())
                     {
                         control.Width = Width;
+                        if(control.Controls["Remove"] is Button buttonRemove)
+                        {
+                            buttonRemove.Width = 25;
+                            buttonRemove.Height = 25;
+                            buttonRemove.Left = control.Width - (buttonRemove.Width + 20);
+                            buttonRemove.Top = (control.Height - buttonRemove.Height) / 2;
+                        }
                     }
                 }
             };
@@ -91,6 +114,7 @@ namespace debug_custom_combo_box
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
         }
+
         protected override CreateParams CreateParams
         {
             get
@@ -108,33 +132,31 @@ namespace debug_custom_combo_box
             if (!_initialized)
             {
                 _initialized = true;
-                if (ColumnCount == 0)
+                if (ColumnCount < 2)
                 {
                     ColumnCount = 2;
+                }
+                if(ColumnStyles.Count < 2)
+                {
                     ColumnStyles.Clear();
                     ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
                     ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
                 }
-
                 if (RowCount == 0)
                 {
                     RowCount = 1;
+                }
+                if (RowStyles.Count == 0)
+                {
                     RowStyles.Clear();
                     RowStyles.Add(new RowStyle(SizeType.AutoSize));
                 }
-
                 if (Controls.Count == 0)
                 {
                     Controls.Add(_labelDropDown, 0, 0);
                     Controls.Add(_buttonDropDown, 1, 0);
                 }
             }
-            // Although the intention is to allow design time
-            // mods of rows and columns. for now let us know:
-            Debug.Assert(ColumnStyles.Count == 2);
-            Debug.Assert(ColumnCount == 2);
-            Debug.Assert(RowStyles.Count == 1);
-            Debug.Assert(RowCount == 1);
         }
 
         private void Any_ControlClick(object? sender, EventArgs e)
@@ -143,6 +165,16 @@ namespace debug_custom_combo_box
             {
                 _labelDropDown.Text = control.Text;
             }
+        }
+        private void Any_Remove(object? sender, MouseEventArgs e)
+        {
+            if(
+                sender is Control control &&
+                control.Parent is CheckBox checkbox &&
+                checkbox.Parent is FlowLayoutPanel parent)
+            {
+                parent.Controls.Remove(checkbox);
+            };
         }
         private readonly Label _labelDropDown = new Label
         {
