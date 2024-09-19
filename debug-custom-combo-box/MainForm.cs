@@ -39,7 +39,7 @@ namespace debug_custom_combo_box
                         {
                             Text = item.Text,
                             Height = 80,
-                            BackColor = Color.White,
+                            BackColor = Color.White, 
                             ForeColor = Color.Black,
                         });
                         break;
@@ -84,6 +84,7 @@ namespace debug_custom_combo_box
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
         }
+        // Try to innoculate against handle recreation at design time.
         bool _initialized = false;
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -227,7 +228,7 @@ namespace debug_custom_combo_box
             public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
 
             [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
-            public System.Drawing.Color ForeColor { get; set; } = System.Drawing.Color.Black;
+            public Color ForeColor { get; set; } = Color.Black;
             public override string ToString() => Text;
         }
     }
