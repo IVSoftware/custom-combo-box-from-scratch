@@ -1,13 +1,5 @@
-
-
-using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Drawing.Design;
-using System.Security.Cryptography;
-using System.Windows.Forms.Design;
 
 namespace debug_custom_combo_box
 {
@@ -16,6 +8,21 @@ namespace debug_custom_combo_box
         public MainForm()
         {
             InitializeComponent();
+            textBoxNewItem.TextChanged += (sender, e) =>
+                buttonAdd.Enabled = !string.IsNullOrWhiteSpace(textBoxNewItem.Text);
+            textBoxNewItem.KeyDown += (sender, e) =>
+            {
+                switch (e.KeyData)
+                {
+                    case Keys.Enter: 
+                        e.SuppressKeyPress = true;
+                        customDropDown.Items.Add(textBoxNewItem.Text);
+                        textBoxNewItem.Clear();
+                        break;
+                }
+            };
+            buttonAdd.Click += (sender, e) => 
+            { };
         }
     }
 
@@ -79,34 +86,40 @@ namespace debug_custom_combo_box
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
         }
+        bool _initialized = false;
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-
-            if (ColumnCount == 0)
+            if (!_initialized)
             {
-                ColumnCount = 2;
-                ColumnStyles.Clear();
-                ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-                ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            }
+                _initialized = true;
+                if (ColumnCount == 0)
+                {
+                    ColumnCount = 2;
+                    ColumnStyles.Clear();
+                    ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                    ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+                }
 
-            if (RowCount == 0)
-            {
-                RowCount = 1;
-                RowStyles.Clear();
-                RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            }
+                if (RowCount == 0)
+                {
+                    RowCount = 1;
+                    RowStyles.Clear();
+                    RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                }
 
-            if (Controls.Count == 0)
-            {
-                Controls.Add(_labelDropDown, 0, 0);
-                Controls.Add(_buttonDropDown, 1, 0);
+                if (Controls.Count == 0)
+                {
+                    Controls.Add(_labelDropDown, 0, 0);
+                    Controls.Add(_buttonDropDown, 1, 0);
+                }
             }
-
-            foreach (var item in Items)
-            {
-            }
+            // Although the intention is to allow design time
+            // mods of rows and columns. for now let us know:
+            Debug.Assert(ColumnStyles.Count == 2);
+            Debug.Assert(ColumnCount == 2);
+            Debug.Assert(RowStyles.Count == 1);
+            Debug.Assert(RowCount == 1);
         }
 
         private void Any_ControlClick(object? sender, EventArgs e)
@@ -203,9 +216,17 @@ namespace debug_custom_combo_box
         }
         private BindingList<Item> _items = new BindingList<Item>();
 
+        public enum ItemStyle
+        {
+            Button,
+            Checkbox,
+        }
         public class Item
         {
+            public static implicit operator Item(string text) =>
+                new Item { Text = text };
             public string Text { get; set; } = "Item";
+            public ItemStyle Style { get; set; }
             public override string ToString() => Text;
         }
     }
