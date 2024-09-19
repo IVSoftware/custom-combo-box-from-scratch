@@ -1,3 +1,4 @@
+using IVSoftware.Portable;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -176,37 +177,75 @@ namespace debug_custom_combo_box
             set => _labelDropDown.Text = value;
         }
         const int WM_LBUTTONDOWN = 0x201;
+        const int WM_KEYDOWN = 0x100;
+        const int VK_ESCAPE = 0x1B;
         public bool PreFilterMessage(ref Message m)
         {
-            var hWnd = m.HWnd;
-            switch (m.Msg)
+            if (_dropDownContainer.Visible)
             {
-                case WM_LBUTTONDOWN:
-                    if (_dropDownContainer.Visible)
-                    {
-                        bool wantClose = true;
-                        if(FromHandle(hWnd) is Control target)
+                var hWnd = m.HWnd;
+                switch (m.Msg)
+                {
+                    case WM_LBUTTONDOWN:
+                        if (FromHandle(hWnd) is Control target)
                         {
                             Point client = new Point(
-                                    m.LParam.ToInt32() & 0xFFFF, 
+                                    m.LParam.ToInt32() & 0xFFFF,
                                     m.LParam.ToInt32() >> 16);
-                            if 
+                            if
                                 (target is CheckBox checkBox &&
-                                _flowLayoutPanel.Controls.Contains(checkBox) &&
-                                checkBox.Appearance == Appearance.Normal)
+                                _flowLayoutPanel.Controls.Contains(checkBox))
                             {
-                                Size boxSize = SystemInformation.MenuCheckSize;
-                                Rectangle boxRect = new Rectangle(new Point(0, (checkBox.Height - boxSize.Height) / 2), boxSize);
+                                if (ModifierKeys == Keys.Control)
+                                {
+                                    // Toggle appearance
+                                    switch (checkBox.Appearance)
+                                    {
+                                        case Appearance.Normal:
+                                            _debounce.StartOrRestart(() =>
+                                            {
+                                                checkBox.Appearance = Appearance.Button;
+                                                checkBox.Text = checkBox.Text.Replace(nameof(CheckBox), nameof(Button), StringComparison.OrdinalIgnoreCase);
+                                            });
+                                            break;
+                                        case Appearance.Button:
+                                            _debounce.StartOrRestart(() =>
+                                            {
+                                                checkBox.Appearance = Appearance.Normal;
+                                                checkBox.Text = checkBox.Text.Replace(nameof(Button), nameof(CheckBox), StringComparison.OrdinalIgnoreCase);
+                                            });
+                                            break;
+                                    }
+                                    return true;
+                                }
+                                else
+                                {
+                                    Size boxSize = SystemInformation.MenuCheckSize;
+                                    Rectangle boxRect = new Rectangle(new Point(0, (checkBox.Height - boxSize.Height) / 2), boxSize);
 
-                                wantClose = !boxRect.Contains(client);
+                                    if (boxRect.Contains(client))
+                                    {
+                                        _debounce.StartOrRestart(() => checkBox.Checked = !checkBox.Checked);
+                                        return true;
+                                    }
+                                }
                             }
-                           if(wantClose) BeginInvoke(() => _dropDownContainer.Close());
                         }
-                    }
-                    break;
+                        BeginInvoke(() => _dropDownContainer.Close());
+                        break;
+                    case WM_KEYDOWN:
+                        if (m.WParam.ToInt32() == VK_ESCAPE)
+                        {
+                            BeginInvoke(() => _dropDownContainer.Close());
+                            return true;
+                        }
+                        break;
+                }
             }
             return false;
         }
+        // <PackageReference Include="IVSoftware.Portable.WatchdogTimer" Version="1.2.1" />
+        WatchdogTimer _debounce = new WatchdogTimer{Interval = TimeSpan.FromSeconds(0.1)};
         protected override void OnMove(EventArgs e)
         {
             base.OnMove(e);
