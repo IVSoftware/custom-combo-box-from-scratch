@@ -35,12 +35,16 @@ namespace debug_custom_combo_box
                 {
                     case ListChangedType.ItemAdded:
                         var item = Items[e.NewIndex];
-                        _flowLayoutPanel.Controls.Add(new Button
+                        _flowLayoutPanel.Controls.Add(new CheckBox
                         {
                             Text = item.Text,
                             Height = 80,
-                            BackColor = Color.White, 
-                            ForeColor = Color.Black,
+                            BackColor = item.BackColor,
+                            ForeColor = item.ForeColor,
+                            Appearance =
+                                item.ControlStyle == ControlStyle.Checkbox ?
+                                Appearance.Normal :
+                                Appearance.Button
                         });
                         break;
                     case ListChangedType.ItemDeleted:
@@ -53,7 +57,6 @@ namespace debug_custom_combo_box
                         break;
                 }
             };
-
             _dropDownContainer.Controls.Add(_flowLayoutPanel);
             _dropDownContainer.VisibleChanged += (sender, e) =>
             {
@@ -83,6 +86,15 @@ namespace debug_custom_combo_box
             };
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
+        }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000; 
+                return cp;
+            }
         }
         // Try to innoculate against handle recreation at design time.
         bool _initialized = false;
@@ -170,17 +182,41 @@ namespace debug_custom_combo_box
             switch (m.Msg)
             {
                 case WM_LBUTTONDOWN:
-                    if(_dropDownContainer.Visible)
+                    if (_dropDownContainer.Visible)
                     {
-                        if(FromHandle(hWnd) is Control control)
+                        if(FromHandle(hWnd) is Control target)
                         {
-                            BeginInvoke(()=> _dropDownContainer.Close());
-                            if (ReferenceEquals(control, _buttonDropDown))
+                            Point client = new Point(
+                                    m.LParam.ToInt32() & 0xFFFF, 
+                                    m.LParam.ToInt32() >> 16);
+                            if 
+                                (target is CheckBox checkBox &&
+                                _flowLayoutPanel.Controls.Contains(checkBox) &&
+                                checkBox.Appearance == Appearance.Normal)
                             {
-                                return true;
+                                Size boxSize = SystemInformation.MenuCheckSize;
+                                Rectangle boxRect = new Rectangle(new Point(0, (checkBox.Height - boxSize.Height) / 2), boxSize);
+
+                                if (boxRect.Contains(client))
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    BeginInvoke(() => _dropDownContainer.Close());
+                                    return true;
+                                }
                             }
-                        }                        
-                    };
+                            else
+                            {
+                                BeginInvoke(() => _dropDownContainer.Close());
+                                if (ReferenceEquals(target, _buttonDropDown))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                     break;
             }
             return false;
@@ -226,6 +262,7 @@ namespace debug_custom_combo_box
                 new Item { Text = text };
             public string Text { get; set; } = "Item";
             public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
+            public Color BackColor { get; set; } = Color.White;
 
             [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public Color ForeColor { get; set; } = Color.Black;
