@@ -18,16 +18,16 @@ namespace debug_custom_combo_box
             InitializeComponent();
             buttonTest.Click += (sender, e) =>
             {
-                var editor = new StringCollectionEditor();
+                var editor = new CustomStringCollectionEditor();
                 var testList = new BindingList<string> { "Item 1", "Item 2", "Item 3" };
-                ITypeDescriptorContext? context = null; 
+                ITypeDescriptorContext? context = null;
                 IWindowsFormsEditorService editorService = new MockWindowsFormsEditorService();
                 var serviceProvider = new SimpleServiceProvider();
                 serviceProvider.AddService(typeof(IWindowsFormsEditorService), editorService);
 
-                if(serviceProvider is IWindowsFormsEditorService validProvider)
+                if (serviceProvider is IWindowsFormsEditorService validProvider)
                 {
-                    if( serviceProvider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService validService)
+                    if (serviceProvider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService validService)
                     {
                         // Invoke the editor
                         var result = editor.EditValue(context, (IServiceProvider)validProvider, testList);
@@ -35,8 +35,13 @@ namespace debug_custom_combo_box
                     }
                     else Debug.Fail("Expecting valid service");
                 }
-                else Debug.Fail("Expecting valid provider" );
+                else Debug.Fail("Expecting valid provider");
             };
+        }
+
+        private void customDropDown_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
     public class SimpleServiceProvider : IWindowsFormsEditorService, IServiceProvider
@@ -80,11 +85,6 @@ namespace debug_custom_combo_box
     {
         public CustomDropDownListFromScratch()
         {
-            ColumnCount = 2;
-            ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            RowCount = 1;
-            RowStyles.Add(new RowStyle(SizeType.AutoSize));
             AutoSize = true;
             Controls.Add(_labelDropDown, 0, 0);
             Controls.Add(_buttonDropDown, 1, 0);
@@ -129,6 +129,23 @@ namespace debug_custom_combo_box
             };
             Application.AddMessageFilter(this);
             Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
+        }
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            // Init if InitializeComponent of the parent
+            // has run and there are still 0 counts.
+            if (ColumnCount == 0)
+            {
+                ColumnCount = 2;
+                ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+                ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
+            }
+            if(RowCount == 0)
+            {
+                RowCount = 1;
+                RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            }
         }
         private void Any_ButtonClick(object? sender, EventArgs e)
         {
@@ -217,15 +234,24 @@ namespace debug_custom_combo_box
             }
         }
 
-        #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public BindingList<string> Items
+        #region Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)   
+        // This custom editor IS NOT FOUND by Designer.
+        [Editor(typeof(CustomStringCollectionEditor), typeof(UITypeEditor))]
+        public ObservableCollection<StringItem> Items
         {
             get { return _items; }
             set { _items = value; }
         }
-        private BindingList<string> _items = new BindingList<string>();
+        private ObservableCollection<StringItem> _items = new ObservableCollection<StringItem>();
         #endregion Init Text (from Designer), Init Items (From Designer), Add and Remove Items (Runtime)
+
+        public class StringItem
+        {
+            public string Text { get; set; } = "Item";
+            public string Value { get; set; } = string.Empty;
+
+            public override string ToString() => Text;
+        }
     }
     /// <summary>
     /// Mutable item class that defaults to 2 columns (Auto, 80) where
@@ -266,7 +292,7 @@ namespace debug_custom_combo_box
         public event EventHandler? ItemClicked;
         public override string ToString() => Text;
     }
-    public class StringCollectionEditor : UITypeEditor
+    public class CustomStringCollectionEditor : UITypeEditor
     {
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
         {

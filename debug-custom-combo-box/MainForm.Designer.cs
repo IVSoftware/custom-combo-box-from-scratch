@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             customDropDown = new CustomDropDownListFromScratch();
             buttonTest = new Button();
             SuspendLayout();
@@ -40,32 +41,6 @@
             customDropDown.ColumnCount = 2;
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            customDropDown.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
             customDropDown.DropDownText = "Select";
             customDropDown.Font = new Font("Segoe UI", 15F);
             customDropDown.Location = new Point(34, 60);
@@ -75,18 +50,9 @@
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
-            customDropDown.RowStyles.Add(new RowStyle());
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
+            customDropDown.Paint += customDropDown_Paint;
             // 
             // buttonTest
             // 
