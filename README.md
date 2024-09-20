@@ -2,15 +2,13 @@ Your comment says:
 
 > ...based on your feedback Jimi and IV. Maybe you have some extra pointers.
 
+With that in mind, reading through the answer that you posted, it doesn't really capture my particular feedback of using a top level borderless form as a custom drop list for your combo box. So, I hoped that by laying out a basic implementation below maybe I could clarify what my suggestion would look like in code and on screen.
+
+[![showing a top level form as a drop down][1]][1]
+
+Sometimes we go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it can be less painful to start from scratch, inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to make the drop down visible, show a top level borderless `Form` containing a docked `FlowLayoutPanel` that in turn can hold "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
+
 ___
-
-If it were based on my feedback in particular, a basic implementation might look more like this (before implementing custom functionality you show in your answer like `initialDropDownButtonText` and `itemsList`). 
-
-[![custom combo box][1]][1]
-
-___
-
-Sometimes we go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it can be less painful to start from scratch, inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked `FlowLayoutPanel` that can contain "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
 
 The first thing out new control is going to need is an `Items` collection.
 
@@ -27,11 +25,15 @@ public class Item
     public static implicit operator Item(string text) =>
         new Item { Text = text };
     public string Text { get; set; } = "Item";
-    public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
+
+    [Category("Appearance")]
     public Color BackColor { get; set; } = Color.White;
 
-    [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
+    [Category("Appearance")]
     public Color ForeColor { get; set; } = Color.Black;
+
+    [Category("Style")]
+    public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
 
     [Browsable(false)]
     internal CheckBox? Control { get; set; }
@@ -54,15 +56,15 @@ Now, by exposing both the `Items` collection and perhaps a `PlaceholderText` pro
 
 ###### In the Designer
 
-[Placeholder]
+[![windows forms designer window][2]][2]
 
 ###### At runtime
 
-[Placeholder]
+[![runtime editing with property grid][3]][3]
 
 ___
 
-##### _...Based on IV feedback..._
+##### Here's how to _"show a top-level borderless form..."_
 
 I had commented:
 > Start by inheriting TableLayoutPanel instead of ComboBox (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked FlowLayoutPanel that can contain "anything under the sun", making sure it tracks any movement of the TopLevelForm while it's visible. 
@@ -163,13 +165,18 @@ ___
 
 ##### Full Example
 
-My comment below provides a link to my GitHub repo where you can [Browse or Clone]() how I added my extra features.
+My comment below provides a link to my GitHub repo where you can [Browse or Clone](https://github.com/IVSoftware/custom-combo-box-from-scratch.git) how I added my extra features.
 
 - Style drop down items with `ForeColor` and `BackColor`
 - Display as either a `Button` appearance or a `CheckBox` appearance.
-- Add or Remove styled items at runtime.
+- Add or Remove styled items at runtime, with a custom PropertyGrid to edit new items.
+- Make the dropdown, if visible, track movement of its parent form.
 - Close the dropdown if [Escape] key is pressed, or if mouse is clicked "anywhere else".
 - Toggle a checkbox without closing the dropdown.
 - Toggle between `Button` appearance and `CheckBox` appearance at runtime using [Control] + Click.
 - Reset to PlaceholderText if dynamic item removal makes it invalid.
 
+
+  [1]: https://i.sstatic.net/AvMdiU8J.png
+  [2]: https://i.sstatic.net/QsfjcX8n.png
+  [3]: https://i.sstatic.net/17Vv553L.png
