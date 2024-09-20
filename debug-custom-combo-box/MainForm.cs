@@ -10,19 +10,6 @@ namespace debug_custom_combo_box
         public MainForm()
         {
             InitializeComponent();
-            textBoxNewItem.TextChanged += (sender, e) =>
-                buttonAdd.Enabled = !string.IsNullOrWhiteSpace(textBoxNewItem.Text);
-            textBoxNewItem.KeyDown += (sender, e) =>
-            {
-                switch (e.KeyData)
-                {
-                    case Keys.Enter:
-                        e.SuppressKeyPress = true;
-                        customDropDown.Items.Add(textBoxNewItem.Text);
-                        textBoxNewItem.Clear();
-                        break;
-                }
-            };
         }
     }
 
@@ -114,7 +101,7 @@ namespace debug_custom_combo_box
                 return cp;
             }
         }
-        // Try to innoculate against handle recreation at design time.
+        // Try to inoculate against handle recreation at design time.
         bool _initialized = false;
         protected override void OnVisibleChanged(EventArgs e)
         {
@@ -331,13 +318,10 @@ namespace debug_custom_combo_box
                 }
             }
         }
+
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public BindingList<Item> Items
-        {
-            get { return _items; }
-            set { _items = value; }
-        }
-        private BindingList<Item> _items = new BindingList<Item>();
+        public BindingList<Item> Items { get; } = new BindingList<Item>();
+
         private ItemEditorPropertyForm _itemEditor = new ItemEditorPropertyForm();
         public enum ControlStyle
         {
@@ -349,11 +333,15 @@ namespace debug_custom_combo_box
             public static implicit operator Item(string text) =>
                 new Item { Text = text };
             public string Text { get; set; } = "Item";
-            public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
+
+            [Category("Appearance")]
             public Color BackColor { get; set; } = Color.White;
 
-            [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            [Category("Appearance")]
             public Color ForeColor { get; set; } = Color.Black;
+
+            [Category("Style")]
+            public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
 
             [Browsable(false)]
             internal CheckBox? Control { get; set; }

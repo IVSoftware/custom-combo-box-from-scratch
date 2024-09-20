@@ -1,48 +1,106 @@
-Sometimes people go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it's way less painful to start by inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked `FlowLayoutPanel` that can contain "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
+Your comment says:
 
-Here,we demonstrate a basic implemention.
+> ...based on your feedback Jimi and IV. Maybe you have some extra pointers.
+
+___
+
+If it were based on my feedback in particular, a basic implementation might look more like this (before implementing custom functionality you show in your answer like `initialDropDownButtonText` and `itemsList`). 
+
+[![custom combo box][1]][1]
+
+___
+
+Sometimes we go to great lengths to do custom draws and such on `ComboBox`, trying to teach the proverbial pig to sing (which wastes your time and annoys the pig). In my own experience, it can be less painful to start from scratch, inheriting `TableLayoutPanel` instead of `ComboBox` (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked `FlowLayoutPanel` that can contain "anything under the sun", making sure it tracks any movement of the `TopLevelForm` while it's visible.
+
+The first thing out new control is going to need is an `Items` collection.
+
+```
+[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+public BindingList<Item> Items { get; } = new BindingList<Item>();
+```
+
+Since the stated goal is _adding some features_, make a custom item to support the intended features. In this example, one such feature is individual drop down items that can be styled with `ForeColor` and `BackColor`, and can display with either a `Button` appearance or a `CheckBox` appearance.
+
+```
+public class Item
+{
+    public static implicit operator Item(string text) =>
+        new Item { Text = text };
+    public string Text { get; set; } = "Item";
+    public ControlStyle ControlStyle { get; set; } = ControlStyle.Button;
+    public Color BackColor { get; set; } = Color.White;
+
+    [Editor(typeof(System.Drawing.Design.ColorEditor), typeof(System.Drawing.Design.UITypeEditor))]
+    public Color ForeColor { get; set; } = Color.Black;
+
+    [Browsable(false)]
+    internal CheckBox? Control { get; set; }
+
+    public override string ToString() => Text;
+}
+```
+
+##### Adding Items at in the Visual Studio Designer
+
+The ability to edit the `Items` collection in the Visual Studio Designer requires no effort on our part; it's there by default.
+
+
+
+___
 
 ```
 public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
 {
     public CustomDropDownListFromScratch()
     {
-        ColumnCount = 2;
-        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80F));
-        RowCount = 1;
-        RowStyles.Add(new RowStyle(SizeType.AutoSize));
         AutoSize = true;
-        Controls.Add(_labelDropDown, 0, 0);
-        Controls.Add(_buttonDropDown, 1, 0);
-
-        for (int i = 1; i <= 3; i++)
+        Items.ListChanged += (sender, e) =>
         {
-            _flowLayoutPanel.Controls.Add(new Button
+            CheckBox checkBox;
+            Item item;
+            switch (e.ListChangedType)
             {
-                Text = $"Item {i}",
-                Height = 80,
-                BackColor = Color.White,
-                ForeColor = Color.Black,
-            });
-        }
-
+                case ListChangedType.ItemAdded:
+                    item = Items[e.NewIndex];
+                    checkBox = new CheckBox
+                    {
+                        Text = item.Text,
+                        Height = 80,
+                        BackColor = item.BackColor,
+                        ForeColor = item.ForeColor,
+                        Appearance =
+                            item.ControlStyle == ControlStyle.Checkbox ?
+                            Appearance.Normal :
+                            Appearance.Button,
+                    };
+                    checkBox.MouseDown += Any_ControlClick;
+                    _flowLayoutPanel.Controls.Add(checkBox);
+                    item.Control = checkBox;
+                    break;
+                case ListChangedType.ItemDeleted:
+                    item = Items[e.OldIndex];
+                    if(item.Control is Control control)
+                    {
+                        control.MouseDown -= Any_ControlClick;
+                    }
+                    break;
+            }
+        };
         _dropDownContainer.Controls.Add(_flowLayoutPanel);
         _dropDownContainer.VisibleChanged += (sender, e) =>
         {
             if (_dropDownContainer.Visible)
             {
                 _dropDownContainer.Width = Width;
-                foreach (var btn in _flowLayoutPanel.Controls.OfType<Button>())
+                foreach (var control in _flowLayoutPanel.Controls.OfType<Control>())
                 {
-                    btn.Width = Width;
-                    btn.MouseDown -= Any_ButtonClick;
-                    btn.MouseDown += Any_ButtonClick;
+                    control.Width = Width;
                 }
             }
         };
         _dropDownContainer.FormClosing += (sender, e) =>
         {
+            // Don't allow the drop down window to dispose!
             if (e.CloseReason == CloseReason.UserClosing)
             {
                 e.Cancel = true;
@@ -57,94 +115,4 @@ public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
         Application.AddMessageFilter(this);
         Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
     }
-
-    private void Any_ButtonClick(object? sender, EventArgs e)
-    {
-        if ((sender is Button button))
-        {
-            _labelDropDown.Text = button.Text;
-        }
-    }
-
-    private readonly Label _labelDropDown = new Label
-    {
-        Dock = DockStyle.Fill,
-        TextAlign = ContentAlignment.MiddleLeft,
-    };
-    private readonly Button _buttonDropDown = new Button
-    {
-        Dock = DockStyle.Fill,
-        Text = "V",
-        FlatStyle = FlatStyle.Flat,
-        ForeColor = Color.White,
-        BackColor = SystemColors.ControlDark,
-    };
-    private Form _dropDownContainer = new Form
-    {
-        StartPosition = FormStartPosition.Manual,
-        TopLevel = true,
-        MinimumSize = new Size(0, 80),
-        FormBorderStyle = FormBorderStyle.None,
-        BackColor= Color.White,
-        AutoSize = true,
-        AutoSizeMode = AutoSizeMode.GrowAndShrink
-    };
-    FlowLayoutPanel _flowLayoutPanel = new FlowLayoutPanel
-    {
-        Dock = DockStyle.Fill,
-        AutoSize = true,
-        AutoSizeMode = AutoSizeMode.GrowAndShrink,
-        FlowDirection = FlowDirection.TopDown,
-    };
-    public string DropDownText
-    {
-        get => _labelDropDown.Text;
-        set => _labelDropDown.Text = value;
-    }
-
-    const int WM_LBUTTONDOWN = 0x201;
-    public bool PreFilterMessage(ref Message m)
-    {
-        var hWnd = m.HWnd;
-        switch (m.Msg)
-        {
-            case WM_LBUTTONDOWN:
-                if(_dropDownContainer.Visible)
-                {
-                    if(FromHandle(hWnd) is Control control)
-                    {
-                        BeginInvoke(()=> _dropDownContainer.Close());
-                        if (ReferenceEquals(control, _buttonDropDown))
-                        {
-                            return true;
-                        }
-                    }                        
-                };
-                break;
-        }
-        return false;
-    }
-    protected override void OnMove(EventArgs e)
-    {
-        base.OnMove(e);
-        _dropDownContainer.Location = PointToScreen(new Point(0, this.Height));
-    }
-    protected override void OnParentChanged(EventArgs e)
-    {
-        base.OnParentChanged(e);
-        if (TopLevelControl is Control valid)
-        {
-            valid.Move -= localOnMove;
-            valid.Move += localOnMove;
-            void localOnMove(object? sender, EventArgs e)
-            {
-                if (_dropDownContainer.Visible)
-                {
-                    Point screenPoint = this.PointToScreen(new Point(0, this.Height));
-                    _dropDownContainer.Location = new Point(screenPoint.X, screenPoint.Y);
-                }
-            }
-        }
-    }
-}
 ```

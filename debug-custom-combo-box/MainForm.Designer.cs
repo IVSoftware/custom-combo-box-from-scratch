@@ -32,8 +32,6 @@
             CustomDropDownListFromScratch.Item item2 = new CustomDropDownListFromScratch.Item();
             CustomDropDownListFromScratch.Item item3 = new CustomDropDownListFromScratch.Item();
             customDropDown = new CustomDropDownListFromScratch();
-            textBoxNewItem = new TextBox();
-            buttonAdd = new Label();
             SuspendLayout();
             // 
             // customDropDown
@@ -60,7 +58,7 @@
             customDropDown.Items.Add(item1);
             customDropDown.Items.Add(item2);
             customDropDown.Items.Add(item3);
-            customDropDown.Location = new Point(34, 114);
+            customDropDown.Location = new Point(32, 82);
             customDropDown.Margin = new Padding(0);
             customDropDown.Name = "customDropDown";
             customDropDown.PlaceholderText = "Select";
@@ -69,32 +67,11 @@
             customDropDown.Size = new Size(394, 67);
             customDropDown.TabIndex = 0;
             // 
-            // textBoxNewItem
-            // 
-            textBoxNewItem.Font = new Font("Segoe UI", 12F);
-            textBoxNewItem.Location = new Point(117, 40);
-            textBoxNewItem.Name = "textBoxNewItem";
-            textBoxNewItem.PlaceholderText = "New Button Item";
-            textBoxNewItem.Size = new Size(311, 39);
-            textBoxNewItem.TabIndex = 1;
-            // 
-            // buttonAdd
-            // 
-            buttonAdd.Enabled = false;
-            buttonAdd.Location = new Point(34, 44);
-            buttonAdd.Name = "buttonAdd";
-            buttonAdd.Size = new Size(77, 34);
-            buttonAdd.TabIndex = 2;
-            buttonAdd.Text = "ADD";
-            buttonAdd.TextAlign = ContentAlignment.MiddleLeft;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(478, 244);
-            Controls.Add(buttonAdd);
-            Controls.Add(textBoxNewItem);
             Controls.Add(customDropDown);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -106,7 +83,5 @@
         #endregion
 
         private CustomDropDownListFromScratch customDropDown;
-        private TextBox textBoxNewItem;
-        private Label buttonAdd;
     }
 }
