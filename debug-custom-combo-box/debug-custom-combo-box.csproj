@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Screenshots\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="IVSoftware.Portable.WatchdogTimer" Version="1.2.1" />
   </ItemGroup>
 

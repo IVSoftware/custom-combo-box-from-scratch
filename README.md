@@ -19,7 +19,7 @@ The first thing out new control is going to need is an `Items` collection.
 public BindingList<Item> Items { get; } = new BindingList<Item>();
 ```
 
-Since the stated goal is _adding some features_, make a custom item to support the intended features. In this example, one such feature is individual drop down items that can be styled with `ForeColor` and `BackColor`, and can display with either a `Button` appearance or a `CheckBox` appearance.
+Since the stated goal is _adding some features_, make a custom item that supports the functionality you intend. In this example, one such feature is individual drop down items that can be styled with `ForeColor` and `BackColor`, and can display with either a `Button` appearance or a `CheckBox` appearance. 
 
 ```
 public class Item
@@ -40,13 +40,34 @@ public class Item
 }
 ```
 
-##### Adding Items at in the Visual Studio Designer
+Having a collection of items provides a more flexible alternative to the constructor you show in your answer:
 
-The ability to edit the `Items` collection in the Visual Studio Designer requires no effort on our part; it's there by default.
+```
+public CustomComboBox(string initialDropDownButtonText, string[] itemsList){ ... }
+```
 
+Now, by exposing both the `Items` collection and perhaps a `PlaceholderText` property for when a selection has not been made, there are multiple ways to edit the items:
 
+- Add the styled drop down items in the Designer so that they're compiled in.
+- Modify the `Items` collection programmatically at runtime in the code.
+- Provide the user with an interface to add or remove items dynamically at runtime.
+
+###### In the Designer
+
+[Placeholder]
+
+###### At runtime
+
+[Placeholder]
 
 ___
+
+##### _...Based on IV feedback..._
+
+I had commented:
+> Start by inheriting TableLayoutPanel instead of ComboBox (or any other control), and when the time comes to make the drop down visible, show a top level borderless form with a docked FlowLayoutPanel that can contain "anything under the sun", making sure it tracks any movement of the TopLevelForm while it's visible. 
+
+Here's what a basic implementation of that comment looks like:
 
 ```
 public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
@@ -115,4 +136,40 @@ public class CustomDropDownListFromScratch : TableLayoutPanel, IMessageFilter
         Application.AddMessageFilter(this);
         Disposed += (sender, e) =>Application.RemoveMessageFilter(this);
     }
+    
+    private Form _dropDownContainer = new Form
+    {
+        StartPosition = FormStartPosition.Manual,
+        TopLevel = true,
+        MinimumSize = new Size(0, 80),
+        FormBorderStyle = FormBorderStyle.None,
+        BackColor= Color.White,
+        AutoSize = true,
+        AutoSizeMode = AutoSizeMode.GrowAndShrink
+    };
+    FlowLayoutPanel _flowLayoutPanel = new FlowLayoutPanel
+    {
+        Dock = DockStyle.Fill,
+        AutoSize = true,
+        AutoSizeMode = AutoSizeMode.GrowAndShrink,
+        FlowDirection = FlowDirection.TopDown,
+    };
+    .
+    .
+    .
+}
 ```
+___
+
+##### Full Example
+
+My comment below provides a link to my GitHub repo where you can [Browse or Clone]() how I added my extra features.
+
+- Style drop down items with `ForeColor` and `BackColor`
+- Display as either a `Button` appearance or a `CheckBox` appearance.
+- Add or Remove styled items at runtime.
+- Close the dropdown if [Escape] key is pressed, or if mouse is clicked "anywhere else".
+- Toggle a checkbox without closing the dropdown.
+- Toggle between `Button` appearance and `CheckBox` appearance at runtime using [Control] + Click.
+- Reset to PlaceholderText if dynamic item removal makes it invalid.
+

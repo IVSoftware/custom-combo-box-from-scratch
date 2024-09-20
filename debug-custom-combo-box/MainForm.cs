@@ -332,6 +332,8 @@ namespace debug_custom_combo_box
         {
             public static implicit operator Item(string text) =>
                 new Item { Text = text };
+
+            [Description("The text shown in the button or checkbox.")]
             public string Text { get; set; } = "Item";
 
             [Category("Appearance")]
